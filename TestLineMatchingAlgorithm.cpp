@@ -47,6 +47,7 @@ the use of this software, even if advised of the possibility of such damage.
 #include <fstream>
 
 
+#include "PairwiseLineMatching.hh"
 #include "LineDescriptor.hh"
 
 
@@ -106,7 +107,7 @@ int main(int argc, char** argv)
   ///////////####################################################################
 	//extract lines, compute their descriptors and match lines
 	LineDescriptor lineDesc;
-//	PairwiseLineMatching lineMatch;
+	PairwiseLineMatching lineMatch;
 
 	ScaleLines   linesInLeft;
 	ScaleLines   linesInRight;
@@ -117,7 +118,7 @@ int main(int argc, char** argv)
 	lineDesc.GetLineDescriptor(rightImage,linesInRight);
 	
 	//TODO remove BIAS dependecies in PairwiseMatching
-//	lineMatch.LineMatching(linesInLeft,linesInRight,matchResult);
+	lineMatch.LineMatching(linesInLeft,linesInRight,matchResult);
 
   ///////////####################################################################
   ///////////####################################################################
