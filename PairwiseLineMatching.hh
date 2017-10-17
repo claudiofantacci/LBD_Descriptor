@@ -37,7 +37,11 @@ class PairwiseLineMatching
 public:
     PairwiseLineMatching(){};
     void LineMatching(ScaleLines &linesInLeft,ScaleLines &linesInRight,
-    		std::vector<unsigned int> &matchResult);
+                      std::vector<unsigned int> &matchResult);
+
+    void PlotMatching(std::string path, std::vector<unsigned int> matching, cv::Mat imageLeft,
+                      ScaleLines &linesInLeft, cv::Mat imageRight,
+                      ScaleLines &linesInRight);
 
 private:
     /* Compute the approximate global rotation angle between image pair(i.e. the left and right images).

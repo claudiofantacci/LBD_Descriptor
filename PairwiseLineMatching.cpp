@@ -659,3 +659,76 @@ void PairwiseLineMatching::MatchingResultFromPrincipalEigenvector_(ScaleLines &l
     cout<<"matchRet1.size"<<matchRet1.size()<<", minOfEigenVec_= "<<minOfEigenVec_<<endl;
 }
 
+void PairwiseLineMatching::PlotMatching(std::string path, std::vector<unsigned int> matching,
+                                        cv::Mat imageLeft, ScaleLines &linesInLeft,
+                                        cv::Mat imageRight, ScaleLines &linesInRight)
+{
+    srand(time(NULL));
+    int lowest = 0, highest = 255;
+    int range = (highest - lowest) + 1;
+
+    for (unsigned int i = 0; i < linesInLeft.size(); i++)
+    {
+        unsigned int r = lowest + int(rand() % range);
+        unsigned int g = lowest + int(rand() % range);
+        unsigned int b = lowest + int(rand() % range);
+        cv::Point startPoint = cv::Point(int(linesInLeft[i][0].startPointX), int(linesInLeft[i][0].startPointY));
+        cv::Point endPoint = cv::Point(int(linesInLeft[i][0].endPointX), int(linesInLeft[i][0].endPointY));
+        cv::line(imageLeft, startPoint, endPoint, cv::Scalar(r, g, b));
+    }
+
+    for (unsigned int i = 0; i < linesInRight.size(); i++)
+    {
+        unsigned int r = lowest + int(rand() % range);
+        unsigned int g = lowest + int(rand() % range);
+        unsigned int b = lowest + int(rand() % range);
+        cv::Point startPoint = cv::Point(int(linesInRight[i][0].startPointX), int(linesInRight[i][0].startPointY));
+        cv::Point endPoint = cv::Point(int(linesInRight[i][0].endPointX), int(linesInRight[i][0].endPointY));
+        cv::line(imageRight, startPoint, endPoint, cv::Scalar(r, g, b));
+    }
+
+    std::vector<unsigned int> r1(matching.size() / 2), g1(matching.size() / 2), b1(
+                                                                                   matching.size() / 2); // The color of lines
+    for (unsigned int pair = 0; pair < matching.size() / 2; pair++)
+    {
+        r1[pair] = lowest + int(rand() % range);
+        g1[pair] = lowest + int(rand() % range);
+        b1[pair] = 255 - r1[pair];
+        double ww1 = 0.2 * (rand() % 5);
+        double ww2 = 1 - ww1;
+        char buf[10];
+        sprintf(buf, "%d ", pair);
+        int lineIDLeft = matching[2 * pair];
+        int lineIDRight = matching[2 * pair + 1];
+        cv::Point startPoint = cv::Point2i(int(linesInLeft[lineIDLeft][0].startPointX),
+                                           int(linesInLeft[lineIDLeft][0].startPointY));
+        cv::Point endPoint = cv::Point2i(int(linesInLeft[lineIDLeft][0].endPointX),
+                                         int(linesInLeft[lineIDLeft][0].endPointY));
+        line(imageLeft, startPoint, endPoint, CvScalar(r1[pair], g1[pair], b1[pair]), 3, CV_AA);
+        startPoint = cv::Point2i(int(linesInRight[lineIDRight][0].startPointX),
+                                 int(linesInRight[lineIDRight][0].startPointY));
+        endPoint = cv::Point2i(int(linesInRight[lineIDRight][0].endPointX), int(linesInRight[lineIDRight][0].endPointY));
+        line(imageRight, startPoint, endPoint, CvScalar(r1[pair], g1[pair], b1[pair]), 3, CV_AA);
+    }
+
+    cv::Size sz = imageLeft.size();
+    cv::Mat result(sz.height, sz.width * 2, CV_8UC3);
+    cv::Mat result_left(result, cv::Rect(0, 0, sz.width, sz.height));
+    imageLeft.copyTo(result_left);
+    cv::Mat result_right(result, cv::Rect(sz.width, 0, sz.width, sz.height));
+    imageRight.copyTo(result_right);
+
+    int imageWidth = imageLeft.cols;
+    for (unsigned int pair = 0; pair < matching.size() / 2; pair++)
+    {
+        int lineIDLeft = matching[2 * pair];
+        int lineIDRight = matching[2 * pair + 1];
+        cv::Point startPoint = cvPoint(int(linesInLeft[lineIDLeft][0].startPointX),
+                                       int(linesInLeft[lineIDLeft][0].startPointY));
+        cv::Point endPoint = cvPoint(int(linesInRight[lineIDRight][0].startPointX + imageWidth),
+                                     int(linesInRight[lineIDRight][0].startPointY));
+        line(result, startPoint, endPoint, CvScalar(r1[pair], g1[pair], b1[pair]), 1, CV_AA);
+    }
+
+    cv::imwrite(path, result);
+}
